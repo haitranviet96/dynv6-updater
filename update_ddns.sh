@@ -1,12 +1,13 @@
 #!/bin/bash
 
+set -e
 # Dynv6 API settings
 source .env
 
 # Function to exit the script on error
 exit_on_error() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] $1" >&2
-    exit 1
+    echo -e "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] $1 \n EXIT SCRIPT NOW." >&2
+    exit 1;
 }
 
 # Fetch current public IPv4 and IPv6 addresses
@@ -90,7 +91,7 @@ if [[ -n "$DNS_IPV4" && -n "$DNS_IPV6" ]]; then
     if [[ "$CURRENT_IPV4" != "$DNS_IPV4" || "$CURRENT_IPV6" != "$DNS_IPV6" ]]; then
         update_zone
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [SUCCESS] $DOMAIN A/AAAA record is already up-to-date." >&2
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] $DOMAIN A/AAAA record is already up-to-date." >&2
     fi
 else
     update_zone
@@ -113,31 +114,27 @@ if [[ -n "$WILDCARD_AAAA_RECORD" ]]; then
     WILDCARD_RECORD_ID=$(echo "$WILDCARD_AAAA_RECORD" | jq -r ".id")
     WILDCARD_DNS_IPV6=$(echo "$WILDCARD_AAAA_RECORD" | jq -r ".data")
 
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Wildcard AAAA record (*) is already up-to-date." >&2
-
     if [[ "$CURRENT_IPV6" != "$WILDCARD_DNS_IPV6" ]]; then
         update_record $ZONE_ID $WILDCARD_RECORD_ID "*" "AAAA" "$CURRENT_IPV6"
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [SUCCESS] Wildcard AAAA record (*) is already up-to-date." >&2
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Wildcard AAAA record (*) is already up-to-date." >&2
     fi
 else
     create_record $ZONE_ID "*" "AAAA" "$CURRENT_IPV6"
 fi
 
-# Wildcard subdomain update
-# A
+# # Wildcard subdomain update
+# # A
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Checking wildcard domain A record (*.$DOMAIN)..." >&2
 WILDCARD_A_RECORD=$(echo "$ZONE_RECORDS" | jq -r ".[] | select(.name==\"*\" and .type==\"A\")")
 if [[ -n "$WILDCARD_A_RECORD" ]]; then
     WILDCARD_RECORD_ID=$(echo "$WILDCARD_A_RECORD" | jq -r ".id")
     WILDCARD_DNS_IPV4=$(echo "$WILDCARD_A_RECORD" | jq -r ".data")
 
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Wildcard A record (*) is already up-to-date." >&2
-
     if [[ "$CURRENT_IPV4" != "$WILDCARD_DNS_IPV4" ]]; then
         update_record $ZONE_ID $WILDCARD_RECORD_ID "*" "A" "$CURRENT_IPV4"
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [SUCCESS] Wildcard A record (*) is already up-to-date." >&2
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Wildcard A record (*) is already up-to-date." >&2
     fi
 else
     create_record $ZONE_ID "*" "A" "$CURRENT_IPV4"

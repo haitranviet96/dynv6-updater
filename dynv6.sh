@@ -2,6 +2,7 @@
 hostname=$1
 device=$2
 file=$HOME/scripts/dynv6/.dynv6.addr6
+PATH="/usr/local/bin:/usr/bin:/bin"
 [ -e $file ] && old=`cat $file`
 
 if [ -z "$hostname" -o -z "$token" ]; then
