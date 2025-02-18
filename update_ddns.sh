@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Define PATH explicitly
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 set -e
 # Dynv6 API settings
 source .env
@@ -54,11 +57,11 @@ update_record() {
     local record_id=$2
     local name=$3
     local type=$4
-    local value=$5
+    local data=$5
 
     # Build payload
     local payload
-    payload="{\"name\":\"$name\",\"type\":\"$type\",\"value\":\"$value\"}"
+    payload="{\"name\":\"$name\",\"type\":\"$type\",\"data\":\"$data\"}"
 
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Updating record with ID: $record_id, Payload: $payload" >&2
     curl -s -X PATCH "https://dynv6.com/api/v2/zones/$zone_id/records/$record_id" \
