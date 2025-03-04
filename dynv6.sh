@@ -38,11 +38,11 @@ current=$address/$netmask
 
 if [ "$old" = "$current" ]; then
   echo "IPv6 address unchanged"
-  exit
+else
+  $bin "http://dynv6.com/api/update?hostname=$hostname&ipv6=$current&token=$token"
 fi
 
 # send addresses to dynv6
-$bin "http://dynv6.com/api/update?hostname=$hostname&ipv6=$current&token=$token"
 $bin "http://ipv4.dynv6.com/api/update?hostname=$hostname&ipv4=auto&token=$token"
 
 # save current address
